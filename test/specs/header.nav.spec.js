@@ -54,6 +54,37 @@ describe('Header navigation', () => {
     await expect(browser).toHaveUrlContaining(href.split('/').filter(Boolean).slice(-1)[0]);
     await expect(browser).toHaveTitleContaining('Y');
   });
+
+  it('Donate and Careers buttons exist and are clickable', async () => {
+    await HomePage.open();
+    const donate = await HomePage.navButton('Donate');
+    const careers = await HomePage.navButton('Careers');
+    await expect(donate).toBeExisting();
+    await expect(careers).toBeExisting();
+    await donate.moveTo();
+    await careers.moveTo();
+  });
+
+  it('Who We Are dropdown has at least one link with href', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const links = await NavMenu.visibleDropdownLinks();
+    expect(links.length).toBeGreaterThan(0);
+    const href = await links[0].getAttribute('href');
+    expect(href).toBeTruthy();
+  });
+
+  it('Get Involved dropdown links are not empty text', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const links = await NavMenu.visibleDropdownLinks();
+    let nonEmpty = 0;
+    for (const l of links.slice(0, 6)) {
+      const t = (await l.getText()).trim();
+      if (t) nonEmpty++;
+    }
+    expect(nonEmpty).toBeGreaterThanOrEqual(Math.min(3, links.length));
+  });
 });
 
 
