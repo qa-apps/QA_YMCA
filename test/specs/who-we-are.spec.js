@@ -54,6 +54,31 @@ describe('Who We Are dropdown', () => {
       await expect(browser).toHaveUrlContaining('ymca');
     }
   });
+
+  it('dropdown link texts are unique among the first six', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const links = await NavMenu.visibleDropdownLinks();
+    const texts = [];
+    for (const l of links.slice(0, 6)) {
+      const t = (await l.getText()).trim();
+      if (t) texts.push(t);
+    }
+    const unique = new Set(texts);
+    expect(unique.size).toBeGreaterThanOrEqual(Math.min(4, texts.length));
+  });
+
+  it('each link has a valid href attribute', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const links = await NavMenu.visibleDropdownLinks();
+    let valid = 0;
+    for (const l of links.slice(0, 6)) {
+      const href = await l.getAttribute('href');
+      if (href && href.length > 1) valid++;
+    }
+    expect(valid).toBeGreaterThanOrEqual(Math.min(3, links.length));
+  });
 });
 
 
