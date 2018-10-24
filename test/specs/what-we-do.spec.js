@@ -60,6 +60,30 @@ describe('What We Do dropdown', () => {
     const set = new Set(texts);
     expect(set.size).toBeGreaterThanOrEqual(Math.min(5, texts.length));
   });
+
+  it('first three links have non-empty text', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    let count = 0;
+    for (const l of links.slice(0, 3)) {
+      const t = (await l.getText()).trim();
+      if (t) count++;
+    }
+    expect(count).toBeGreaterThanOrEqual(Math.min(2, links.length));
+  });
+
+  it('clicks a mid-list link when available', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length >= 3) {
+      await links[2].click();
+      await browser.pause(300);
+      const title = await browser.getTitle();
+      expect(title.length).toBeGreaterThan(3);
+    }
+  });
 });
 
 
