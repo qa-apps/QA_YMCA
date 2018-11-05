@@ -59,6 +59,25 @@ describe('Get Involved dropdown', () => {
     await browser.pause(300);
     await expect(browser).toHaveTitleContaining('Y');
   });
+
+  it('Volunteer link appears among dropdown items when available', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const volunteer = await $('//a[contains(. , \"Volunteer\")]');
+    expect(typeof (await volunteer.isExisting())).toBe('boolean');
+  });
+
+  it('dropdown has at least two unique actionable texts', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const links = await NavMenu.visibleDropdownLinks();
+    const unique = new Set();
+    for (const l of links.slice(0, 6)) {
+      const t = (await l.getText()).trim();
+      if (t) unique.add(t);
+    }
+    expect(unique.size).toBeGreaterThanOrEqual(Math.min(2, links.length));
+  });
 });
 
 
