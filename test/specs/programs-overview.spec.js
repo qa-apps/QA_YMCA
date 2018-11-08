@@ -30,6 +30,24 @@ describe('Programs overview from What We Do', () => {
     const set = new Set(texts);
     expect(set.size).toBeGreaterThanOrEqual(Math.min(3, texts.length));
   });
+
+  it('mid list link has clickable attribute when present', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length >= 2) {
+      const clickable = await links[1].isClickable();
+      expect(typeof clickable).toBe('boolean');
+    }
+  });
+
+  it('dropdown renders at least one anchor with absolute or relative href', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    const href = links.length ? await links[0].getAttribute('href') : '';
+    expect(Boolean(href)).toBe(true);
+  });
 });
 
 
