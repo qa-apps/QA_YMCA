@@ -29,6 +29,17 @@ describe('News & Stories section', () => {
     const anchors = await $$('//a[contains(@href, \"/news\") or contains(@href, \"/stories\")]');
     expect(anchors.length).toBeGreaterThanOrEqual(1);
   });
+
+  it('news cards have non-empty titles for first few items', async () => {
+    await HomePage.open();
+    const cards = await $$('(//a[contains(@href, \"/news\") or contains(@href, \"/stories\")])[position()<=3]');
+    let withText = 0;
+    for (const c of cards) {
+      const t = (await c.getText()).trim();
+      if (t) withText++;
+    }
+    expect(withText).toBeGreaterThanOrEqual(Math.min(1, cards.length));
+  });
 });
 
 
