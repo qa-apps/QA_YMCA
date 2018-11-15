@@ -26,6 +26,17 @@ describe('Social media icons', () => {
     const offsite = await $$('footer a[href^=\"http\"]');
     expect(offsite.length).toBeGreaterThan(0);
   });
+
+  it('social links are keyboard focusable', async () => {
+    await HomePage.open();
+    const links = await $$('footer a[href^=\"http\"]');
+    if (links.length > 0) {
+      await links[0].focus();
+      const active = await browser.getActiveElement();
+      const tag = await active.getTagName();
+      expect(tag.toLowerCase()).toBe('a');
+    }
+  });
 });
 
 
