@@ -25,6 +25,13 @@ describe('Policy links', () => {
       await expect(browser).toHaveUrlContaining(href.split('/').filter(Boolean).slice(-1)[0]);
     }
   });
+
+  it('policy links are present in footer navigation area', async () => {
+    await HomePage.open();
+    const footer = await $('footer');
+    const links = await footer.$$(':scope a');
+    expect(links.length).toBeGreaterThan(0);
+  });
 });
 
 
