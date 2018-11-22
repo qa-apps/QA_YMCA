@@ -26,6 +26,17 @@ describe('Header search behavior', () => {
       expect(url.length).toBeGreaterThan(10);
     }
   });
+
+  it('header search is focusable via keyboard', async () => {
+    await HomePage.open();
+    const input = await $('header input[type=\"search\"], header input[placeholder*=\"Search\" i]');
+    if (await input.isExisting()) {
+      await input.focus();
+      const active = await browser.getActiveElement();
+      const tag = await active.getTagName();
+      expect(tag.toLowerCase()).toBe('input');
+    }
+  });
 });
 
 
