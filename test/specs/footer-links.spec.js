@@ -25,6 +25,20 @@ describe('Footer links', () => {
       await expect(browser).toHaveTitleContaining('Financial');
     }
   });
+
+  it('footer contains Privacy Policy and Terms of Use labels when present', async () => {
+    await HomePage.open();
+    const priv = await $('//footer//a[contains(. , \"Privacy\")]');
+    const terms = await $('//footer//a[contains(. , \"Terms\")]');
+    expect((await priv.isExisting()) || (await terms.isExisting())).toBe(true);
+  });
+
+  it('first visible footer link has href', async () => {
+    await HomePage.open();
+    const first = await $('footer a');
+    const href = await first.getAttribute('href');
+    expect(href).toBeTruthy();
+  });
 });
 
 
