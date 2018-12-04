@@ -26,6 +26,18 @@ describe('Footer column structure', () => {
     await expect(first).toBeExisting();
     await expect(first).toBeDisplayed();
   });
+
+  it('every sampled column has at least one visible link', async () => {
+    await HomePage.open();
+    const footer = await $('footer');
+    const groups = await footer.$$('nav, ul, div:has(a)');
+    const sample = groups.slice(0, 3);
+    for (const g of sample) {
+      const link = await g.$('a');
+      await expect(link).toBeExisting();
+      await expect(link).toBeDisplayed();
+    }
+  });
 });
 
 
