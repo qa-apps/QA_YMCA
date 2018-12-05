@@ -28,6 +28,12 @@ describe('Site accessibility controls', () => {
     const live = await $$('[aria-live]');
     expect(Array.isArray(live)).toBe(true);
   });
+
+  it('page has at least one heading element', async () => {
+    await HomePage.open();
+    const anyHeading = await $$('h1, h2, h3, h4, h5, h6');
+    expect(anyHeading.length).toBeGreaterThan(0);
+  });
 });
 
 
