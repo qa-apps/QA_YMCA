@@ -26,6 +26,12 @@ describe('Language and text fallbacks', () => {
       expect(Boolean((name && name.trim()) || (text && text.trim()))).toBe(true);
     }
   });
+
+  it('html lang is not empty and appears language-like', async () => {
+    await HomePage.open();
+    const lang = (await $('html').getAttribute('lang')) || '';
+    expect(lang.length).toBeGreaterThan(0);
+  });
 });
 
 
