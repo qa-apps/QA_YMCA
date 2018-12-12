@@ -8,3 +8,4 @@
 - docs: note 3
 - docs: note 4
 - docs: note 5
+- docs: note 6
