@@ -3,3 +3,4 @@
 - docs: housekeeping 3
 - docs: housekeeping 4
 - docs: housekeeping 5
+- docs: note 1
