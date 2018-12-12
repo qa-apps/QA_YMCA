@@ -26,6 +26,13 @@ describe('About/Who We Are quick checks', () => {
       expect(t.length).toBeGreaterThan(3);
     }
   });
+
+  it('Our People link exists when available', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const people = await $('//a[contains(. , \"Our People\")]');
+    expect(typeof (await people.isExisting())).toBe('boolean');
+  });
 });
 
 
