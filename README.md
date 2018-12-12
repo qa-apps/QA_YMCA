@@ -5,3 +5,4 @@
 - docs: housekeeping 5
 - docs: note 1
 - docs: note 2
+- docs: note 3
