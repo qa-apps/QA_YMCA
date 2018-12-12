@@ -10,3 +10,4 @@
 - docs: note 5
 - docs: note 6
 - docs: note 7
+- docs: note 8
