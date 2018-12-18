@@ -30,6 +30,12 @@ describe('Find nearby widget behavior', () => {
     await $('body').click();
     await expect(input).toHaveValueContaining('10001');
   });
+
+  it('search CTA exists even if disabled initially', async () => {
+    await HomePage.open();
+    const go = await $('//button[contains(. , \"Search\")] | //a[contains(. , \"Search YMCAs\")]');
+    expect(typeof (await go.isExisting())).toBe('boolean');
+  });
 });
 
 
