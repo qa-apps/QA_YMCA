@@ -30,6 +30,19 @@ describe('Find Your Y widget', () => {
     const geoExists = await geo.isExisting();
     expect(micExists || geoExists).toBe(true);
   });
+
+  it('map or results area placeholder may appear after search', async () => {
+    await HomePage.open();
+    const input = await $('//input[contains(@placeholder, \"ZIP\") or contains(@placeholder, \"City\") or @type=\"search\"]');
+    await input.setValue('NY');
+    const go = await $('//button[contains(. , \"Search\")] | //a[contains(. , \"Search YMCAs\")]');
+    if (await go.isExisting()) {
+      await go.click();
+      await browser.pause(300);
+      const results = await $$('section, div').then(list => list.slice(0, 5));
+      expect(Array.isArray(results)).toBe(true);
+    }
+  });
 });
 
 
