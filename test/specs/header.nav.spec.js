@@ -88,3 +88,47 @@ describe('Header navigation', () => {
 });
 
 
+describe('Header nav deep checks (2019-01-07)', () => {
+  it('top nav buttons expose controls or links', async () => {
+    await HomePage.open();
+    const labels = ['Who We Are', 'What We Do', 'Get Involved'];
+    for (const label of labels) {
+      const btn = await HomePage.navButton(label);
+      await expect(btn).toBeExisting();
+      const controls = await btn.getAttribute('aria-controls');
+      const role = await btn.getAttribute('role');
+      expect(Boolean(controls) || role === 'link').toBe(true);
+    }
+  });
+
+  it('hover What We Do exposes at least two links', async () => {
+    await HomePage.open();
+    await HomePage.hoverNav('What We Do');
+    const panel = await HomePage.dropdownPanel('What We Do');
+    await expect(panel).toBeDisplayed();
+    const links = await panel.$$(':scope a[href]');
+    expect(links.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('hover Get Involved exposes actionable links', async () => {
+    await HomePage.open();
+    await HomePage.hoverNav('Get Involved');
+    const panel = await HomePage.dropdownPanel('Get Involved');
+    await expect(panel).toBeDisplayed();
+    const links = await panel.$$(':scope a[href]');
+    let count = 0;
+    for (const a of links.slice(0, 5)) {
+      const t = (await a.getText()).trim();
+      if (t) count++;
+    }
+    expect(count).toBeGreaterThanOrEqual(2);
+  });
+
+  it('Donate and Careers are reachable in header area', async () => {
+    await HomePage.open();
+    const donate = await HomePage.navButton('Donate');
+    const careers = await HomePage.navButton('Careers');
+    await expect(donate).toBeExisting();
+    await expect(careers).toBeExisting();
+  });
+});
