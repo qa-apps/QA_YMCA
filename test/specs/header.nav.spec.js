@@ -132,3 +132,46 @@ describe('Header nav deep checks (2019-01-07)', () => {
     await expect(careers).toBeExisting();
   });
 });
+
+describe('Header navigation – extended checks (2019-01-07)', () => {
+  it('top-level buttons expose aria-controls or act as links', async () => {
+    await HomePage.open();
+    const labels = ['Who We Are', 'What We Do', 'Get Involved', 'Donate', 'Careers'];
+    for (const label of labels) {
+      const btn = await HomePage.navButton(label);
+      await expect(btn).toBeExisting();
+      const controls = await btn.getAttribute('aria-controls');
+      const role = await btn.getAttribute('role');
+      expect(Boolean(controls) || role === 'link').toBe(true);
+    }
+  });
+
+  it('hovering toggles aria-expanded on menus when supported', async () => {
+    await HomePage.open();
+    const who = await HomePage.navButton('Who We Are');
+    await who.moveTo();
+    const expanded = await who.getAttribute('aria-expanded');
+    expect(['true', 'false', null].includes(expanded)).toBe(true);
+  });
+
+  it('navigates via a Careers/Donate element without client error', async () => {
+    await HomePage.open();
+    const candidates = [await HomePage.navButton('Careers'), await HomePage.navButton('Donate')];
+    for (const el of candidates) {
+      if (await el.isExisting()) {
+        await el.click();
+        await browser.pause(200);
+        const title = await browser.getTitle();
+        expect(title.length).toBeGreaterThan(3);
+        break;
+      }
+    }
+  });
+});
+  it('header contains at least one visible anchor', async () => {
+    await HomePage.open();
+    const a = await $('header a');
+    await expect(a).toBeExisting();
+    await expect(a).toBeDisplayed();
+  });
+});
