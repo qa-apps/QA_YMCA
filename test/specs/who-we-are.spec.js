@@ -82,3 +82,37 @@ describe('Who We Are dropdown', () => {
 });
 
 
+describe('Who We Are additional checks (2019-01-09)', () => {
+  it('dropdown shows Our Vision or Strong Communities', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const vision = await $('//a[contains(. , "Our Vision")]');
+    const strong = await $('//a[contains(. , "Our Strong Communities")]');
+    expect((await vision.isExisting()) || (await strong.isExisting())).toBe(true);
+  });
+
+  it('at least three non-empty items among first seven', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const links = await NavMenu.visibleDropdownLinks();
+    let nonEmpty = 0;
+    for (const l of links.slice(0, 7)) {
+      const t = (await l.getText()).trim();
+      if (t) nonEmpty++;
+    }
+    expect(nonEmpty).toBeGreaterThanOrEqual(Math.min(3, links.length));
+  });
+
+  it('navigates to first present link and checks url contains a slug', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length > 0) {
+      const href = await links[0].getAttribute('href');
+      await links[0].click();
+      await browser.pause(300);
+      const slug = (href || '').split('/').filter(Boolean).slice(-1)[0] || 'y';
+      await expect(browser).toHaveUrlContaining(slug);
+    }
+  });
+});
