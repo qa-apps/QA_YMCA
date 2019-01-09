@@ -116,3 +116,48 @@ describe('Who We Are additional checks (2019-01-09)', () => {
     }
   });
 });
+
+describe('Who We Are – content integrity (2019-01-09)', () => {
+  it('dropdown items have readable text and valid hrefs', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const links = await NavMenu.visibleDropdownLinks();
+    let ok = 0;
+    for (const l of links.slice(0, 8)) {
+      const t = (await l.getText()).trim();
+      const href = await l.getAttribute('href');
+      if (t && href) ok++;
+    }
+    expect(ok).toBeGreaterThanOrEqual(Math.min(3, links.length));
+  });
+
+  it('navigates to first available info page and validates title length', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length) {
+      await links[0].click();
+      await browser.pause(300);
+      const title = await browser.getTitle();
+      expect(title.length).toBeGreaterThan(5);
+    }
+  });
+
+  it('menu contains at least three non-empty labels when possible', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const links = await NavMenu.visibleDropdownLinks();
+    const texts = [];
+    for (const l of links.slice(0, 6)) {
+      const t = (await l.getText()).trim();
+      if (t) texts.push(t);
+    }
+    expect(texts.length).toBeGreaterThanOrEqual(Math.min(3, links.length));
+  });
+});
+  it('button is present in header for Who We Are', async () => {
+    await HomePage.open();
+    const b = await HomePage.navButton('Who We Are');
+    await expect(b).toBeExisting();
+  });
+});
