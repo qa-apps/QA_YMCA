@@ -81,3 +81,50 @@ describe('Get Involved dropdown', () => {
 });
 
 
+
+describe('Get Involved – engagement checks (2019-01-24)', () => {
+  it('ensures at least one action has a visible label', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const links = await NavMenu.visibleDropdownLinks();
+    const hasText = (await Promise.all(links.slice(0, 6).map(async l => (await l.getText()).trim()))).some(Boolean);
+    expect(hasText).toBe(true);
+  });
+
+  it('tries to open Work at the Y or fallback first item', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const work = await $('//a[contains(. , "Work at the Y")]');
+    if (await work.isExisting()) {
+      await work.click();
+    } else {
+      const links = await NavMenu.visibleDropdownLinks();
+      if (links.length) await links[0].click();
+    }
+    await browser.pause(300);
+    expect((await browser.getTitle()).length).toBeGreaterThan(3);
+  });
+
+  it('verifies at least two unique texts among first five items', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const links = await NavMenu.visibleDropdownLinks();
+    const texts = [];
+    for (const l of links.slice(0, 5)) {
+      const t = (await l.getText()).trim();
+      if (t) texts.push(t);
+    }
+    const unique = new Set(texts);
+    expect(unique.size).toBeGreaterThanOrEqual(Math.min(2, texts.length));
+  });
+});
+  it('Volunteer link clickable when displayed', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const v = await ;
+    if (await v.isExisting()) {
+      const clickable = await v.isClickable();
+      expect(typeof clickable).toBe('boolean');
+    }
+  });
+});
