@@ -52,3 +52,46 @@ describe('Donate and Careers navigation', () => {
 });
 
 
+
+describe('Donate/Careers – header functional passes (2019-01-28)', () => {
+  it('Donate has href in menu or navigates directly', async () => {
+    await HomePage.open();
+    const panel = await HomePage.dropdownPanel('Donate');
+    const anchors = await panel.$$(':scope a[href]');
+    if (anchors.length) {
+      const href = await anchors[0].getAttribute('href');
+      expect(href).toBeTruthy();
+    } else {
+      const btn = await HomePage.navButton('Donate');
+      await btn.click();
+      await browser.pause(200);
+      expect((await browser.getTitle()).length).toBeGreaterThan(2);
+    }
+  });
+
+  it('Careers reachable and page contains a title', async () => {
+    await HomePage.open();
+    const careers = await HomePage.navButton('Careers');
+    await careers.click();
+    await browser.pause(200);
+    const title = await browser.getTitle();
+    expect(title.length).toBeGreaterThan(3);
+  });
+
+  it('Donate element is focusable and visible', async () => {
+    await HomePage.open();
+    const donate = await HomePage.navButton('Donate');
+    await donate.focus();
+    const active = await browser.getActiveElement();
+    const tag = await active.getTagName();
+    expect(tag.length).toBeGreaterThan(0);
+    await expect(donate).toBeDisplayed();
+  });
+});
+  it('Careers button is displayed in header area', async () => {
+    await HomePage.open();
+    const c = await HomePage.navButton('Careers');
+    await expect(c).toBeExisting();
+    await expect(c).toBeDisplayed();
+  });
+});
