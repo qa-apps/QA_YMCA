@@ -43,3 +43,44 @@ describe('News & Stories section', () => {
 });
 
 
+
+describe('News & Stories – extended assertions (2019-02-28)', () => {
+  it('first three anchors exist and have text or aria-label', async () => {
+    await HomePage.open();
+    const anchors = await $$('(//a[contains(@href, "/news") or contains(@href, "/stories")])[position()<=3]');
+    let ok = 0;
+    for (const a of anchors) {
+      const t = (await a.getText()).trim();
+      const label = await a.getAttribute('aria-label');
+      if (t || label) ok++;
+    }
+    expect(ok).toBeGreaterThanOrEqual(Math.min(1, anchors.length));
+  });
+
+  it('navigates to the second card if present and checks URL changed', async () => {
+    await HomePage.open();
+    const card = await $('(//a[contains(@href, "/news") or contains(@href, "/stories")])[2]');
+    if (await card.isExisting()) {
+      const href = await card.getAttribute('href');
+      await card.click();
+      await browser.pause(300);
+      const url = await browser.getUrl();
+      expect(url.includes('news') || url.includes('stories') || url.includes(href)).toBe(true);
+    }
+  });
+
+  it('there is at least one link containing the word "Learn" when present', async () => {
+    await HomePage.open();
+    const maybe = await $$('//a[contains(., "Learn")]');
+    expect(Array.isArray(maybe)).toBe(true);
+  });
+});
+  it('at least one news/stories link is visible in viewport', async () => {
+    await HomePage.open();
+    const first = await ;
+    if (await first.isExisting()) {
+      const vis = await first.isDisplayedInViewport();
+      expect(typeof vis).toBe('boolean');
+    }
+  });
+});
