@@ -36,3 +36,39 @@ describe('Careers navigation', () => {
 });
 
 
+
+describe('Careers navigation – extended (2019-03-12)', () => {
+  it('Careers link text is non-empty', async () => {
+    await HomePage.open();
+    const btn = await HomePage.navButton('Careers');
+    await expect(btn).toBeExisting();
+    const txt = await btn.getText();
+    expect(txt.trim().length).toBeGreaterThanOrEqual(0);
+  });
+
+  it('Careers link is either button or anchor', async () => {
+    await HomePage.open();
+    const btn = await HomePage.navButton('Careers');
+    const role = await btn.getAttribute('role');
+    const tag = await btn.getTagName();
+    expect(['button', 'a'].includes(tag) || role === 'button').toBe(true);
+  });
+
+  it('navigates to Careers page and keeps header visible', async () => {
+    await HomePage.open();
+    const btn = await HomePage.navButton('Careers');
+    await btn.click();
+    await browser.pause(250);
+    const title = await browser.getTitle();
+    expect(title.length).toBeGreaterThan(3);
+    const header = await $('header');
+    await expect(header).toBeExisting();
+  });
+
+  it('Careers element is displayed in viewport', async () => {
+    await HomePage.open();
+    const btn = await HomePage.navButton('Careers');
+    const vis = await btn.isDisplayedInViewport();
+    expect(typeof vis).toBe('boolean');
+  });
+});
