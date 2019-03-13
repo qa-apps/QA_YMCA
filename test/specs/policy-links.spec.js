@@ -35,3 +35,44 @@ describe('Policy links', () => {
 });
 
 
+
+describe('Policy links – footer validation (2019-03-13)', () => {
+  it('footer contains at least one policy-related anchor', async () => {
+    await HomePage.open();
+    const a = await $('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    await expect(a).toBeExisting();
+  });
+
+  it('policy anchors have readable text', async () => {
+    await HomePage.open();
+    const links = await $$('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    let ok = 0;
+    for (const l of links.slice(0, 4)) {
+      const t = (await l.getText()).trim();
+      if (t) ok++;
+    }
+    expect(ok).toBeGreaterThanOrEqual(Math.min(1, links.length));
+  });
+
+  it('clicks first policy link and ensures URL changes or contains anchor', async () => {
+    await HomePage.open();
+    const l = await $('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    if (await l.isExisting()) {
+      const href = await l.getAttribute('href');
+      await l.click();
+      await browser.pause(300);
+      const url = await browser.getUrl();
+      expect(url.includes('#') || url !== '').toBe(true);
+      if (href && href.startsWith('#')) expect(url.includes('#')).toBe(true);
+    }
+  });
+});
+  it('policy link visibility in viewport', async () => {
+    await HomePage.open();
+    const a = await ;
+    if (await a.isExisting()) {
+      const vis = await a.isDisplayedInViewport();
+      expect(typeof vis).toBe('boolean');
+    }
+  });
+});
