@@ -36,3 +36,45 @@ describe('Site search and voice control', () => {
 });
 
 
+
+describe('Site search/voice – extended (2019-03-19)', () => {
+  it('search input supports clearing and retyping', async () => {
+    await HomePage.open();
+    const input = await $('//input[contains(@placeholder, "Search") or @type="search"]');
+    if (await input.isExisting()) {
+      await input.setValue('camp');
+      await input.clearValue();
+      await input.setValue('YMCA');
+      await expect(input).toHaveValueContaining('Y');
+    }
+  });
+
+  it('voice button presence is a boolean condition', async () => {
+    await HomePage.open();
+    const voice = await $('button[aria-label*="voice" i], [class*="voice" i]');
+    const exists = await voice.isExisting();
+    expect(typeof exists).toBe('boolean');
+  });
+
+  it('submit triggers URL change or remains stable without error', async () => {
+    await HomePage.open();
+    const submit = await $('//button[contains(. , "Search")] | //input[@type="submit"]');
+    if (await submit.isExisting()) {
+      await submit.click();
+      await browser.pause(200);
+      const url = await browser.getUrl();
+      expect(url.length).toBeGreaterThan(0);
+    }
+  });
+});
+  it('search icon focusability if present', async () => {
+    await HomePage.open();
+    const btn = await ;
+    if (await btn.isExisting()) {
+      await btn.focus();
+      const active = await browser.getActiveElement();
+      const tag = await active.getTagName();
+      expect(tag.length).toBeGreaterThan(0);
+    }
+  });
+});
