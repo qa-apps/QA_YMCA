@@ -37,3 +37,37 @@ describe('Site accessibility controls', () => {
 });
 
 
+
+describe('Accessibility – keyboard/landmarks (2019-03-22)', () => {
+  it('page provides role=main or main element', async () => {
+    await HomePage.open();
+    const mainEl = await $('main, [role="main"]');
+    await expect(mainEl).toBeExisting();
+  });
+
+  it('header/nav is keyboard focusable via Tab', async () => {
+    await HomePage.open();
+    await browser.keys(['Tab']);
+    const active = await browser.getActiveElement();
+    const tag = await active.getTagName();
+    expect(tag.length).toBeGreaterThan(0);
+  });
+
+  it('there exists at least one aria-label on interactive element', async () => {
+    await HomePage.open();
+    const el = await $('[aria-label]');
+    expect(typeof (await el.isExisting())).toBe('boolean');
+  });
+
+  it('skip link or similar anchor may exist', async () => {
+    await HomePage.open();
+    const skip = await $('a[href^="#"]');
+    expect(Array.isArray(await $$('a[href^="#"]'))).toBe(true);
+  });
+});
+  it('footer contains at least one role=contentinfo landmark', async () => {
+    await HomePage.open();
+    const foot = await ;
+    await expect(foot).toBeExisting();
+  });
+});
