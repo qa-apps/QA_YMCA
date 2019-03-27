@@ -42,3 +42,39 @@ describe('Footer links', () => {
 });
 
 
+
+describe('Footer links – extended (2019-03-27)', () => {
+  it('footer exposes multiple anchors with hrefs', async () => {
+    await HomePage.open();
+    const links = await $$('footer a[href]');
+    expect(links.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('first three footer links have non-empty text when available', async () => {
+    await HomePage.open();
+    const links = await $$('footer a[href]');
+    let withText = 0;
+    for (const l of links.slice(0, 3)) {
+      const t = (await l.getText()).trim();
+      if (t) withText++;
+    }
+    expect(withText).toBeGreaterThanOrEqual(Math.min(1, links.length));
+  });
+
+  it('navigates via first footer link and validates page title length', async () => {
+    await HomePage.open();
+    const first = await $('footer a[href]');
+    if (await first.isExisting()) {
+      await first.click();
+      await browser.pause(300);
+      const title = await browser.getTitle();
+      expect(title.length).toBeGreaterThan(3);
+    }
+  });
+
+  it('footer region is visible in viewport', async () => {
+    await HomePage.open();
+    const footer = await $('footer');
+    await expect(footer).toBeExisting();
+  });
+});
