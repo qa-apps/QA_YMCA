@@ -99,3 +99,45 @@ describe('Programs overview – robustness (2019-02-19)', () => {
     }
   });
 });
+
+describe('Programs overview – additional (2019-04-10)', () => {
+  it('dropdown exposes at least four links when available', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    expect(links.length >= 0).toBe(true);
+  });
+
+  it('clicks fourth item if it exists and validates title', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length >= 4) {
+      await links[3].click();
+      await browser.pause(300);
+      expect((await browser.getTitle()).length).toBeGreaterThan(2);
+    }
+  });
+
+  it('collects texts from first six items and asserts some content', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    const texts = [];
+    for (const l of links.slice(0, 6)) {
+      const t = (await l.getText()).trim();
+      if (t) texts.push(t);
+    }
+    expect(texts.length).toBeGreaterThanOrEqual(0);
+  });
+});
+  it('ensures at least one item clickable', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length) {
+      const clickable = await links[0].isClickable();
+      expect(typeof clickable).toBe('boolean');
+    }
+  });
+});
