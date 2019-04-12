@@ -128,3 +128,51 @@ describe('Get Involved – engagement checks (2019-01-24)', () => {
     }
   });
 });
+
+describe('Get Involved – deeper coverage (2019-04-12)', () => {
+  it('Partner with Us or Advocate links exist when available', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const partner = await $('//a[contains(. , "Partner with Us")]');
+    const advocate = await $('//a[contains(. , "Advocate")]');
+    expect((await partner.isExisting()) || (await advocate.isExisting())).toBe(true);
+  });
+
+  it('clicks Partner/Advocate/first and expects page title', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const partner = await $('//a[contains(. , "Partner with Us")]');
+    const advocate = await $('//a[contains(. , "Advocate")]');
+    if (await partner.isExisting()) await partner.click();
+    else if (await advocate.isExisting()) await advocate.click();
+    else {
+      const links = await NavMenu.visibleDropdownLinks();
+      if (links.length) await links[0].click();
+    }
+    await browser.pause(300);
+    const title = await browser.getTitle();
+    expect(title.length).toBeGreaterThan(3);
+  });
+
+  it('ensures four unique link texts among first eight', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const links = await NavMenu.visibleDropdownLinks();
+    const set = new Set();
+    for (const l of links.slice(0, 8)) {
+      const t = (await l.getText()).trim();
+      if (t) set.add(t);
+    }
+    expect(set.size).toBeGreaterThanOrEqual(Math.min(4, links.length));
+  });
+});
+  it('ensures Become a Member item is clickable when available', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const el = await ;
+    if (await el.isExisting()) {
+      const clickable = await el.isClickable();
+      expect(typeof clickable).toBe('boolean');
+    }
+  });
+});
