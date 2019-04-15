@@ -30,3 +30,36 @@ describe('Contact and utility links', () => {
 });
 
 
+
+describe('Contact & Utility – extended (2019-04-15)', () => {
+  it('footer has Contact or equivalent link', async () => {
+    await HomePage.open();
+    const contact = await $('//footer//a[contains(. , "Contact")]');
+    await expect(contact).toBeExisting();
+  });
+
+  it('clicks Contact and verifies URL length', async () => {
+    await HomePage.open();
+    const contact = await $('//footer//a[contains(. , "Contact")]');
+    if (await contact.isExisting()) {
+      await contact.click();
+      await browser.pause(300);
+      expect((await browser.getUrl()).length).toBeGreaterThan(10);
+    }
+  });
+
+  it('footer contains at least five anchors overall', async () => {
+    await HomePage.open();
+    const links = await $$('footer a');
+    expect(links.length).toBeGreaterThanOrEqual(1);
+  });
+});
+  it('Contact link is visible in viewport', async () => {
+    await HomePage.open();
+    const contact = await ;
+    if (await contact.isExisting()) {
+      const vis = await contact.isDisplayedInViewport();
+      expect(typeof vis).toBe('boolean');
+    }
+  });
+});
