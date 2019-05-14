@@ -175,3 +175,37 @@ describe('Header navigation – extended checks (2019-01-07)', () => {
     await expect(a).toBeDisplayed();
   });
 });
+
+describe('Header navigation – broader assertions (2019-05-14)', () => {
+  it('each primary item has either aria-controls or href', async () => {
+    await HomePage.open();
+    const labels = ['Who We Are', 'What We Do', 'Get Involved'];
+    for (const l of labels) {
+      const btn = await HomePage.navButton(l);
+      const controls = await btn.getAttribute('aria-controls');
+      const href = await btn.getAttribute('href');
+      expect(Boolean(controls) || Boolean(href)).toBe(true);
+    }
+  });
+
+  it('hovering over What We Do reveals dropdown', async () => {
+    await HomePage.open();
+    await HomePage.hoverNav('What We Do');
+    const panel = await HomePage.dropdownPanel('What We Do');
+    await expect(panel).toBeDisplayed();
+  });
+
+  it('Careers and Donate buttons exist', async () => {
+    await HomePage.open();
+    await expect(await HomePage.navButton('Careers')).toBeExisting();
+    await expect(await HomePage.navButton('Donate')).toBeExisting();
+  });
+});
+  it('Who We Are panel has at least one link with href', async () => {
+    await HomePage.open();
+    await HomePage.hoverNav('Who We Are');
+    const panel = await HomePage.dropdownPanel('Who We Are');
+    const links = await panel.25385(':scope a[href]');
+    expect(links.length).toBeGreaterThanOrEqual(1);
+  });
+});
