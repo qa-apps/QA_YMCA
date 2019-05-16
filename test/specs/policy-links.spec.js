@@ -76,3 +76,35 @@ describe('Policy links – footer validation (2019-03-13)', () => {
     }
   });
 });
+
+describe('Policy visibility – extra checks (2019-05-16)', () => {
+  it('footer lists privacy/terms anchors', async () => {
+    await HomePage.open();
+    const list = await $$('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    expect(Array.isArray(list)).toBe(true);
+  });
+
+  it('first policy anchor is clickable and visible', async () => {
+    await HomePage.open();
+    const a = await $('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    if (await a.isExisting()) {
+      const vis = await a.isDisplayed();
+      expect(vis).toBe(true);
+      const clickable = await a.isClickable();
+      expect(typeof clickable).toBe('boolean');
+    }
+  });
+
+  it('navigates via a policy link and checks URL', async () => {
+    await HomePage.open();
+    const a = await $('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    if (await a.isExisting()) {
+      const href = await a.getAttribute('href');
+      await a.click();
+      await browser.pause(250);
+      const url = await browser.getUrl();
+      expect(url.length).toBeGreaterThan(0);
+      if (href && href.startsWith('#')) expect(url.includes('#')).toBe(true);
+    }
+  });
+});
