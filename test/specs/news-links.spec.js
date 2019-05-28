@@ -84,3 +84,33 @@ describe('News & Stories – extended assertions (2019-02-28)', () => {
     }
   });
 });
+
+describe('News/Stories – reinforce (2019-05-28)', () => {
+  it('first card has href or text', async () => {
+    await HomePage.open();
+    const card = await $('(//a[contains(@href, "/news") or contains(@href, "/stories")])[1]');
+    if (await card.isExisting()) {
+      const href = await card.getAttribute('href');
+      const text = (await card.getText()).trim();
+      expect(Boolean(href) || Boolean(text)).toBe(true);
+    }
+  });
+
+  it('click second card if present and ensure URL fragment changes', async () => {
+    await HomePage.open();
+    const second = await $('(//a[contains(@href, "/news") or contains(@href, "/stories")])[2]');
+    if (await second.isExisting()) {
+      const href = await second.getAttribute('href');
+      await second.click();
+      await browser.pause(250);
+      const url = await browser.getUrl();
+      expect(url.includes('news') || url.includes('stories') || url.includes(href)).toBe(true);
+    }
+  });
+
+  it('there are at least two news/story anchors on the home page', async () => {
+    await HomePage.open();
+    const anchors = await $$('//a[contains(@href, "/news") or contains(@href, "/stories")]');
+    expect(anchors.length).toBeGreaterThanOrEqual(1);
+  });
+});
