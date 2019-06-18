@@ -88,3 +88,37 @@ describe('Header search – resilience (2019-03-14)', () => {
     }
   });
 });
+
+describe('Header search – extended (2019-06-18)', () => {
+  it('typing and clearing maintains expected value state', async () => {
+    await HomePage.open();
+    const input = await $('header input[type="search"], header input[placeholder*="Search" i]');
+    if (await input.isExisting()) {
+      await input.setValue('membership');
+      await input.clearValue();
+      await input.setValue('jobs');
+      await expect(input).toHaveValueContaining('job');
+    }
+  });
+
+  it('submit click does not break header visibility', async () => {
+    await HomePage.open();
+    const btn = await $('header button[type="submit"], header button[aria-label*="search" i]');
+    if (await btn.isExisting()) {
+      await btn.click();
+      await browser.pause(200);
+      await expect($('header')).toBeExisting();
+    }
+  });
+
+  it('search control is focusable via keyboard', async () => {
+    await HomePage.open();
+    const input = await $('header input[type="search"], header input[placeholder*="Search" i]');
+    if (await input.isExisting()) {
+      await input.focus();
+      const active = await browser.getActiveElement();
+      const tag = await active.getTagName();
+      expect(tag.toLowerCase()).toBe('input');
+    }
+  });
+});
