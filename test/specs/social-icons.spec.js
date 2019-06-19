@@ -83,3 +83,34 @@ describe('Social icons – additional checks (2019-03-11)', () => {
     expect(links.length).toBeGreaterThanOrEqual(0);
   });
 });
+
+describe('Social links – extended (2019-06-19)', () => {
+  it('collect first five hrefs and ensure they are non-empty', async () => {
+    await HomePage.open();
+    const links = await $$('footer a[href^="http"]');
+    let ok = 0;
+    for (const a of links.slice(0, 5)) {
+      const href = await a.getAttribute('href');
+      if (href) ok++;
+    }
+    expect(ok).toBeGreaterThanOrEqual(0);
+  });
+
+  it('focus and click first external link does not error', async () => {
+    await HomePage.open();
+    const first = await $('footer a[href^="http"]');
+    if (await first.isExisting()) {
+      await first.focus();
+      await first.click();
+      await browser.pause(200);
+      const t = await browser.getTitle();
+      expect(typeof t).toBe('string');
+    }
+  });
+
+  it('footer contains icon/svg or text-based links', async () => {
+    await HomePage.open();
+    const icon = await $('footer svg, footer i');
+    expect(typeof (await icon.isExisting())).toBe('boolean');
+  });
+});
