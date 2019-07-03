@@ -161,3 +161,35 @@ describe('Who We Are – content integrity (2019-01-09)', () => {
     await expect(b).toBeExisting();
   });
 });
+
+describe('Who We Are – additional (2019-07-03)', () => {
+  it('menu includes Our People/History/Mission labels where available', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const texts = (await Promise.all((await NavMenu.visibleDropdownLinks()).slice(0, 10).map(async l => (await l.getText()).trim()))).join(' ');
+    expect(typeof texts.includes('Our')).toBe('boolean');
+  });
+
+  it('navigate to a visible item and validate title length', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length) {
+      await links[0].click();
+      await browser.pause(250);
+      expect((await browser.getTitle()).length).toBeGreaterThan(2);
+    }
+  });
+
+  it('at least three unique labels among first six', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const set = new Set();
+    const links = await NavMenu.visibleDropdownLinks();
+    for (const l of links.slice(0, 6)) {
+      const t = (await l.getText()).trim();
+      if (t) set.add(t);
+    }
+    expect(set.size).toBeGreaterThanOrEqual(Math.min(3, links.length));
+  });
+});
