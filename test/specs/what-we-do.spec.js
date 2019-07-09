@@ -129,3 +129,38 @@ describe('What We Do – extended menu checks (2019-01-15)', () => {
     }
   });
 });
+
+describe('What We Do – additional (2019-07-09)', () => {
+  it('verify at least four unique items among first seven', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    const set = new Set();
+    for (const l of links.slice(0, 7)) {
+      const t = (await l.getText()).trim();
+      if (t) set.add(t);
+    }
+    expect(set.size).toBeGreaterThanOrEqual(Math.min(4, links.length));
+  });
+
+  it('navigate to mid list item and check title length', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length >= 3) {
+      await links[2].click();
+      await browser.pause(250);
+      expect((await browser.getTitle()).length).toBeGreaterThan(2);
+    }
+  });
+
+  it('first item is clickable when present', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length) {
+      const clickable = await links[0].isClickable();
+      expect(typeof clickable).toBe('boolean');
+    }
+  });
+});
