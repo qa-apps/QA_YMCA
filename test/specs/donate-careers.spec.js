@@ -95,3 +95,42 @@ describe('Donate/Careers – header functional passes (2019-01-28)', () => {
     await expect(c).toBeDisplayed();
   });
 });
+
+describe('Donate/Careers – additional (2019-07-10)', () => {
+  it('Donate dropdown or page reachable and has title', async () => {
+    await HomePage.open();
+    const donate = await HomePage.navButton('Donate');
+    if (await donate.isExisting()) {
+      await donate.click();
+      await browser.pause(250);
+      const title = await browser.getTitle();
+      expect(title.length).toBeGreaterThan(2);
+    }
+  });
+
+  it('Careers page reachable and header persists', async () => {
+    await HomePage.open();
+    const careers = await HomePage.navButton('Careers');
+    if (await careers.isExisting()) {
+      await careers.click();
+      await browser.pause(250);
+      await expect($('header')).toBeExisting();
+    }
+  });
+
+  it('Donate and Careers buttons are displayed in header', async () => {
+    await HomePage.open();
+    await expect(await HomePage.navButton('Donate')).toBeExisting();
+    await expect(await HomePage.navButton('Careers')).toBeExisting();
+  });
+});
+  it('Donate/Careers buttons are focusable', async () => {
+    await HomePage.open();
+    const d = await HomePage.navButton('Donate');
+    const c = await HomePage.navButton('Careers');
+    await d.focus();
+    await c.focus();
+    const active = await browser.getActiveElement();
+    expect(typeof (await active.getTagName())).toBe('string');
+  });
+});
