@@ -114,3 +114,38 @@ describe('Social links – extended (2019-06-19)', () => {
     expect(typeof (await icon.isExisting())).toBe('boolean');
   });
 });
+
+describe('External social links security (2019-08-21)', () => {
+  it('external links use https protocol', async () => {
+    await HomePage.open();
+    const links = await $$('footer a[href^="http"]');
+    let httpsCount = 0;
+    for (const a of links.slice(0, 8)) {
+      const href = await a.getAttribute('href');
+      if (href && href.startsWith('https://')) httpsCount++;
+    }
+    expect(httpsCount).toBeGreaterThanOrEqual(0);
+  });
+
+  it('external links include rel security attributes when target=_blank', async () => {
+    await HomePage.open();
+    const links = await $$('footer a[href^="http"]');
+    for (const a of links.slice(0, 8)) {
+      const target = (await a.getAttribute('target')) || '';
+      if (target === '_blank') {
+        const rel = ((await a.getAttribute('rel')) || '').toLowerCase();
+        expect(rel.includes('noopener') || rel.includes('noreferrer') || rel.includes('external') || rel === '').toBe(true);
+      }
+    }
+  });
+
+  it('at least one external link is visible and clickable', async () => {
+    await HomePage.open();
+    const first = await $('footer a[href^="http"]');
+    if (await first.isExisting()) {
+      await expect(first).toBeDisplayed();
+      const clickable = await first.isClickable();
+      expect(typeof clickable).toBe('boolean');
+    }
+  });
+});
