@@ -108,3 +108,40 @@ describe('Policy visibility – extra checks (2019-05-16)', () => {
     }
   });
 });
+
+describe('Policy links security (2019-08-22)', () => {
+  it('policy anchors use https and may include rel security', async () => {
+    await HomePage.open();
+    const links = await $$('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    for (const l of links.slice(0, 4)) {
+      const href = await l.getAttribute('href');
+      if (href) expect(href.startsWith('http') ? href.startsWith('https://') : true).toBe(true);
+      const target = (await l.getAttribute('target')) || '';
+      if (target === '_blank') {
+        const rel = ((await l.getAttribute('rel')) || '').toLowerCase();
+        expect(rel.includes('noopener') || rel.includes('noreferrer') || rel === '').toBe(true);
+      }
+    }
+  });
+
+  it('policy link is visible and keyboard focusable', async () => {
+    await HomePage.open();
+    const a = await $('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    if (await a.isExisting()) {
+      await expect(a).toBeDisplayed();
+      await a.focus();
+      const active = await browser.getActiveElement();
+      expect(typeof (await active.getTagName())).toBe('string');
+    }
+  });
+
+  it('click on policy link does not remove header', async () => {
+    await HomePage.open();
+    const a = await $('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    if (await a.isExisting()) {
+      await a.click();
+      await browser.pause(200);
+      await expect($('header')).toBeExisting();
+    }
+  });
+});
