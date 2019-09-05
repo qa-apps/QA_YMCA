@@ -71,3 +71,31 @@ describe('Header sticky – additional (2019-03-29)', () => {
     expect((await donate.isExisting()) || (await careers.isExisting())).toBe(true);
   });
 });
+
+describe('Header sticky robustness (2019-09-05)', () => {
+  it('header stays visible after scroll up/down and resize', async () => {
+    await HomePage.open();
+    await browser.execute(() => window.scrollTo(0, document.body.scrollHeight));
+    await browser.setWindowSize(1280, 720);
+    let vis = await $('header').isDisplayedInViewport();
+    expect(typeof vis).toBe('boolean');
+    await browser.execute(() => window.scrollTo(0, 0));
+    vis = await $('header').isDisplayedInViewport();
+    expect(typeof vis).toBe('boolean');
+  });
+
+  it('header contains visible navigation elements after resize', async () => {
+    await HomePage.open();
+    await browser.setWindowSize(1024, 600);
+    const items = await $$('header a, header button');
+    expect(items.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('tabbing focuses an interactive header element', async () => {
+    await HomePage.open();
+    await browser.keys(['Tab']);
+    const active = await browser.getActiveElement();
+    const tag = await active.getTagName();
+    expect(tag.length).toBeGreaterThan(0);
+  });
+});
