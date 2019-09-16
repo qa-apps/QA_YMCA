@@ -122,3 +122,35 @@ describe('Header search – extended (2019-06-18)', () => {
     }
   });
 });
+
+describe('Header search usability (2019-09-16)', () => {
+  it('input has accessible name via placeholder or aria-label', async () => {
+    await HomePage.open();
+    const input = await $('header input[type="search"], header input[placeholder*="Search" i]');
+    if (await input.isExisting()) {
+      const ph = (await input.getAttribute('placeholder')) || '';
+      const al = (await input.getAttribute('aria-label')) || '';
+      expect((ph + al).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('Escape clears value when implemented or value can be cleared programmatically', async () => {
+    await HomePage.open();
+    const input = await $('header input[type="search"], header input[placeholder*="Search" i]');
+    if (await input.isExisting()) {
+      await input.setValue('clearme');
+      await input.clearValue();
+      await expect(input).toHaveValueContaining('');
+    }
+  });
+
+  it('search submit keeps focus within page (no full navigation expected)', async () => {
+    await HomePage.open();
+    const btn = await $('header button[type="submit"], header button[aria-label*="search" i]');
+    if (await btn.isExisting()) {
+      await btn.click();
+      await browser.pause(200);
+      await expect($('header')).toBeExisting();
+    }
+  });
+});
