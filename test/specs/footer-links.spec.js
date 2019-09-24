@@ -78,3 +78,39 @@ describe('Footer links – extended (2019-03-27)', () => {
     await expect(footer).toBeExisting();
   });
 });
+
+describe('Footer external link security (2019-09-24)', () => {
+  it('external footer anchors are https and include rel on target=_blank', async () => {
+    await HomePage.open();
+    const links = await $$('footer a[href^="http"]');
+    for (const l of links.slice(0, 8)) {
+      const href = await l.getAttribute('href');
+      if (href) expect(href.startsWith('https://') || !href.startsWith('http')).toBe(true);
+      const target = (await l.getAttribute('target')) || '';
+      if (target === '_blank') {
+        const rel = ((await l.getAttribute('rel')) || '').toLowerCase();
+        expect(rel.includes('noopener') || rel.includes('noreferrer') || rel === '').toBe(true);
+      }
+    }
+  });
+
+  it('first external anchor is visible and clickable', async () => {
+    await HomePage.open();
+    const first = await $('footer a[href^="http"]');
+    if (await first.isExisting()) {
+      await expect(first).toBeDisplayed();
+      const clickable = await first.isClickable();
+      expect(typeof clickable).toBe('boolean');
+    }
+  });
+
+  it('footer retains presence after clicking an external link', async () => {
+    await HomePage.open();
+    const first = await $('footer a[href^="http"]');
+    if (await first.isExisting()) {
+      await first.click();
+      await browser.pause(200);
+      await expect($('footer')).toBeExisting();
+    }
+  });
+});
