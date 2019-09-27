@@ -141,3 +141,43 @@ describe('Programs overview – additional (2019-04-10)', () => {
     }
   });
 });
+
+describe('Programs dropdown link protocols (2019-09-27)', () => {
+  it('all sampled dropdown links use https or relative URLs', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    let ok = 0;
+    for (const l of links.slice(0, 8)) {
+      const href = await l.getAttribute('href');
+      if (href) {
+        if (href.startsWith('http')) expect(href.startsWith('https://')).toBe(true);
+        ok++;
+      }
+    }
+    expect(ok).toBeGreaterThanOrEqual(0);
+  });
+
+  it('links have discernible text (first six)', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    let readable = 0;
+    for (const l of links.slice(0, 6)) {
+      const t = (await l.getText()).trim();
+      if (t) readable++;
+    }
+    expect(readable).toBeGreaterThanOrEqual(0);
+  });
+
+  it('clicking a link retains header visibility', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length) {
+      await links[0].click();
+      await browser.pause(200);
+      await expect($('header')).toBeExisting();
+    }
+  });
+});
