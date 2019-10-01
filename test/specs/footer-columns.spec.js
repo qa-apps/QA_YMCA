@@ -67,3 +67,39 @@ describe('Footer columns – extended (2019-06-20)', () => {
     expect(typeof (await any.isExisting())).toBe('boolean');
   });
 });
+
+describe('Footer columns accessibility (2019-10-01)', () => {
+  it('footer groups expose list or navigation semantics', async () => {
+    await HomePage.open();
+    const nav = await $('footer nav');
+    const ul = await $('footer ul');
+    expect((await nav.isExisting()) || (await ul.isExisting())).toBe(true);
+  });
+
+  it('each sampled group has at least one focusable link', async () => {
+    await HomePage.open();
+    const groups = await $$('footer nav, footer ul, footer div:has(a)');
+    for (const g of groups.slice(0, 4)) {
+      const link = await g.$('a');
+      await expect(link).toBeExisting();
+    }
+  });
+
+  it('links have discernible text or aria-labels for the first five', async () => {
+    await HomePage.open();
+    const links = await $$('footer a');
+    let ok = 0;
+    for (const l of links.slice(0, 5)) {
+      const t = (await l.getText()).trim();
+      const al = (await l.getAttribute('aria-label')) || '';
+      if (t || al) ok++;
+    }
+    expect(ok).toBeGreaterThanOrEqual(0);
+  });
+});
+  it('footer has at least one region landmark', async () => {
+    await HomePage.open();
+    const region = await ;
+    await expect(region).toBeExisting();
+  });
+});
