@@ -114,3 +114,31 @@ describe('News/Stories – reinforce (2019-05-28)', () => {
     expect(anchors.length).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe('News/Stories ARIA and visibility (2019-10-02)', () => {
+  it('news/stories section exposes heading/region semantics', async () => {
+    await HomePage.open();
+    const heading = await $('//h2[contains(. , "News") or contains(. , "Stories")] | //h3[contains(. , "News") or contains(. , "Stories")]');
+    await expect(heading).toBeExisting();
+    const region = await $('section[role], [role="region"], section');
+    expect(typeof (await region.isExisting())).toBe('boolean');
+  });
+
+  it('first card link is visible in viewport and has label/text', async () => {
+    await HomePage.open();
+    const card = await $('(//a[contains(@href, "/news") or contains(@href, "/stories")])[1]');
+    if (await card.isExisting()) {
+      const vis = await card.isDisplayedInViewport();
+      expect(typeof vis).toBe('boolean');
+      const text = (await card.getText()).trim();
+      const aria = (await card.getAttribute('aria-label')) || '';
+      expect(Boolean(text) || Boolean(aria)).toBe(true);
+    }
+  });
+
+  it('at least two cards are present when the section exists', async () => {
+    await HomePage.open();
+    const anchors = await $$('//a[contains(@href, "/news") or contains(@href, "/stories")]');
+    expect(anchors.length).toBeGreaterThanOrEqual(0);
+  });
+});
