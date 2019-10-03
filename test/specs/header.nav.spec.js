@@ -209,3 +209,32 @@ describe('Header navigation – broader assertions (2019-05-14)', () => {
     expect(links.length).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe('Header keyboard navigation (2019-10-03)', () => {
+  it('Tab focuses a primary nav element', async () => {
+    await HomePage.open();
+    await browser.keys(['Tab']);
+    const active = await browser.getActiveElement();
+    const tag = await active.getTagName();
+    expect(['a', 'button'].includes(tag.toLowerCase())).toBe(true);
+  });
+
+  it('hover + focus on What We Do reveals dropdown', async () => {
+    await HomePage.open();
+    await HomePage.hoverNav('What We Do');
+    const btn = await HomePage.navButton('What We Do');
+    await btn.focus();
+    const panel = await HomePage.dropdownPanel('What We Do');
+    await expect(panel).toBeDisplayed();
+  });
+
+  it('Careers/Donate are focusable and exist', async () => {
+    await HomePage.open();
+    const careers = await HomePage.navButton('Careers');
+    const donate = await HomePage.navButton('Donate');
+    await careers.focus();
+    await donate.focus();
+    await expect(careers).toBeExisting();
+    await expect(donate).toBeExisting();
+  });
+});
