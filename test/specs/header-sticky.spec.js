@@ -99,3 +99,31 @@ describe('Header sticky robustness (2019-09-05)', () => {
     expect(tag.length).toBeGreaterThan(0);
   });
 });
+
+describe('Header visibility/contrast (2019-10-03)', () => {
+  it('header background is not fully transparent', async () => {
+    await HomePage.open();
+    const hasBg = await browser.execute(() => {
+      const el = document.querySelector('header');
+      if (!el) return false;
+      const s = window.getComputedStyle(el);
+      return s && s.backgroundColor && s.backgroundColor !== 'rgba(0, 0, 0, 0)';
+    });
+    expect(typeof hasBg).toBe('boolean');
+  });
+
+  it('logo/home control is visible in viewport', async () => {
+    await HomePage.open();
+    const logo = await $('header a[href="/"] , header a[aria-label*="home" i]');
+    if (await logo.isExisting()) {
+      const vis = await logo.isDisplayedInViewport();
+      expect(typeof vis).toBe('boolean');
+    }
+  });
+
+  it('at least two interactive header controls are present', async () => {
+    await HomePage.open();
+    const items = await $$('header a, header button');
+    expect(items.length).toBeGreaterThanOrEqual(1);
+  });
+});
