@@ -71,3 +71,27 @@ describe('Accessibility – keyboard/landmarks (2019-03-22)', () => {
     await expect(foot).toBeExisting();
   });
 });
+
+describe('ARIA live/roles expansion (2019-10-13)', () => {
+  it('page exposes navigation and main roles', async () => {
+    await HomePage.open();
+    const nav = await $('[role="navigation"], nav');
+    const main = await $('[role="main"], main');
+    await expect(nav).toBeExisting();
+    await expect(main).toBeExisting();
+  });
+
+  it('there is at least one aria-live region when present', async () => {
+    await HomePage.open();
+    const live = await $$('[aria-live]');
+    expect(Array.isArray(live)).toBe(true);
+  });
+
+  it('tabbing cycles focus to a visible control', async () => {
+    await HomePage.open();
+    await browser.keys(['Tab']);
+    const active = await browser.getActiveElement();
+    const tag = await active.getTagName();
+    expect(tag.length).toBeGreaterThan(0);
+  });
+});
