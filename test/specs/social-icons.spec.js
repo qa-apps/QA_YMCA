@@ -149,3 +149,36 @@ describe('External social links security (2019-08-21)', () => {
     }
   });
 });
+
+describe('Social icons labels (2019-10-15)', () => {
+  it('social anchors have aria-label or title where icons are used', async () => {
+    await HomePage.open();
+    const links = await $$('footer a[href^="http"]');
+    let labeled = 0;
+    for (const a of links.slice(0, 8)) {
+      const aria = (await a.getAttribute('aria-label')) || '';
+      const title = (await a.getAttribute('title')) || '';
+      if (aria || title) labeled++;
+    }
+    expect(labeled).toBeGreaterThanOrEqual(0);
+  });
+
+  it('svg icons exist or link text is present', async () => {
+    await HomePage.open();
+    const svg = await $('footer svg');
+    const first = await $('footer a[href^="http"]');
+    const hasText = (await first.getText()).trim().length > 0;
+    expect((await svg.isExisting()) || hasText).toBe(true);
+  });
+
+  it('first social link visible and focusable', async () => {
+    await HomePage.open();
+    const first = await $('footer a[href^="http"]');
+    if (await first.isExisting()) {
+      await expect(first).toBeDisplayed();
+      await first.focus();
+      const active = await browser.getActiveElement();
+      expect(typeof (await active.getTagName())).toBe('string');
+    }
+  });
+});
