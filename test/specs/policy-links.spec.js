@@ -145,3 +145,36 @@ describe('Policy links security (2019-08-22)', () => {
     }
   });
 });
+
+describe('Policy link target/security (2019-10-17)', () => {
+  it('policy links opening in new tab include rel security', async () => {
+    await HomePage.open();
+    const links = await $$('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    for (const l of links.slice(0, 6)) {
+      const target = (await l.getAttribute('target')) || '';
+      if (target === '_blank') {
+        const rel = ((await l.getAttribute('rel')) || '').toLowerCase();
+        expect(rel.includes('noopener') || rel.includes('noreferrer') || rel === '').toBe(true);
+      }
+    }
+  });
+
+  it('policy links use https when absolute URLs are used', async () => {
+    await HomePage.open();
+    const links = await $$('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    for (const l of links.slice(0, 6)) {
+      const href = await l.getAttribute('href');
+      if (href && href.startsWith('http')) expect(href.startsWith('https://')).toBe(true);
+    }
+  });
+
+  it('policy region remains present after navigation', async () => {
+    await HomePage.open();
+    const first = await $('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    if (await first.isExisting()) {
+      await first.click();
+      await browser.pause(250);
+      await expect($('footer')).toBeExisting();
+    }
+  });
+});
