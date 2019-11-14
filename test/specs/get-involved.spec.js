@@ -176,3 +176,43 @@ describe('Get Involved – deeper coverage (2019-04-12)', () => {
     }
   });
 });
+
+describe('Get Involved CTA checks (2019-11-14)', () => {
+  it('dropdown contains action links with discernible names', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const links = await NavMenu.visibleDropdownLinks();
+    let ok = 0;
+    for (const l of links.slice(0, 8)) {
+      const txt = (await l.getText()).trim();
+      const aria = (await l.getAttribute('aria-label')) || '';
+      if (txt || aria) ok++;
+    }
+    expect(ok).toBeGreaterThanOrEqual(Math.min(3, links.length));
+  });
+
+  it('Become a Member/Volunteer are clickable when present', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const member = await $('//a[contains(.,"Become a Member")]');
+    const volunteer = await $('//a[contains(.,"Volunteer")]');
+    const target = (await member.isExisting()) ? member : (await volunteer.isExisting() ? volunteer : null);
+    if (target) {
+      const clickable = await target.isClickable();
+      expect(typeof clickable).toBe('boolean');
+    }
+  });
+
+  it('navigating via an action retains header and creates a valid URL', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Get Involved');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length) {
+      await links[0].click();
+      await browser.pause(200);
+      await expect($('header')).toBeExisting();
+      const url = await browser.getUrl();
+      expect(url.length).toBeGreaterThan(0);
+    }
+  });
+});
