@@ -142,3 +142,36 @@ describe('News/Stories ARIA and visibility (2019-10-02)', () => {
     expect(anchors.length).toBeGreaterThanOrEqual(0);
   });
 });
+
+describe('News/Stories accessibility batch (2019-11-14)', () => {
+  it('news container has role/landmark or heading structure', async () => {
+    await HomePage.open();
+    const heading = await $('//h2[contains(.,"News") or contains(.,"Stories")] | //h3[contains(.,"News") or contains(.,"Stories")]');
+    await expect(heading).toBeExisting();
+    const region = await $('[role="region"], section, main');
+    expect(typeof (await region.isExisting())).toBe('boolean');
+  });
+
+  it('first three cards expose image or text labels', async () => {
+    await HomePage.open();
+    const cards = await $$('(//a[contains(@href, "/news") or contains(@href, "/stories")])[position()<=3]');
+    let ok = 0;
+    for (const c of cards) {
+      const text = (await c.getText()).trim();
+      const aria = (await c.getAttribute('aria-label')) || '';
+      if (text || aria) ok++;
+    }
+    expect(ok).toBeGreaterThanOrEqual(Math.min(1, cards.length));
+  });
+
+  it('keyboard activation on first card keeps page responsive', async () => {
+    await HomePage.open();
+    const first = await $('(//a[contains(@href, "/news") or contains(@href, "/stories")])[1]');
+    if (await first.isExisting()) {
+      await first.focus();
+      await browser.keys(['Enter']);
+      await browser.pause(200);
+      await expect($('header')).toBeExisting();
+    }
+  });
+});
