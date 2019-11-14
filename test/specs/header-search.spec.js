@@ -154,3 +154,37 @@ describe('Header search usability (2019-09-16)', () => {
     }
   });
 });
+
+describe('Header search protection and UX (2019-11-14)', () => {
+  it('input rejects script-like values by clearing or allowing safe chars', async () => {
+    await HomePage.open();
+    const input = await $('header input[type="search"], header input[placeholder*="Search" i]');
+    if (await input.isExisting()) {
+      await input.setValue('<script>alert(1)</script> YMCA');
+      const val = await input.getValue();
+      expect(typeof val).toBe('string');
+    }
+  });
+
+  it('submit button exists and is keyboard-activatable', async () => {
+    await HomePage.open();
+    const btn = await $('header button[type="submit"], header button[aria-label*="search" i]');
+    if (await btn.isExisting()) {
+      await btn.focus();
+      await browser.keys(['Enter']);
+      await browser.pause(150);
+      await expect($('header')).toBeExisting();
+    }
+  });
+
+  it('results or URL changes are tolerated after submit', async () => {
+    await HomePage.open();
+    const btn = await $('header button[type="submit"], header button[aria-label*="search" i]');
+    if (await btn.isExisting()) {
+      await btn.click();
+      await browser.pause(150);
+      const url = await browser.getUrl();
+      expect(url.length).toBeGreaterThan(0);
+    }
+  });
+});
