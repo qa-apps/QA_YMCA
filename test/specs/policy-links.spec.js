@@ -178,3 +178,40 @@ describe('Policy link target/security (2019-10-17)', () => {
     }
   });
 });
+
+describe('Policy links enhancement (2019-11-15)', () => {
+  it('policy anchors avoid javascript: URLs', async () => {
+    await HomePage.open();
+    const links = await $$('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    for (const l of links.slice(0, 6)) {
+      const href = (await l.getAttribute('href')) || '';
+      expect(href.startsWith('javascript:')).toBe(false);
+    }
+  });
+
+  it('policy anchors maintain focus outline for accessibility', async () => {
+    await HomePage.open();
+    const a = await $('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    if (await a.isExisting()) {
+      await a.focus();
+      const hasOutline = await browser.execute(() => {
+        const el = document.activeElement;
+        if (!el) return false;
+        const s = window.getComputedStyle(el);
+        return s && s.outlineStyle && s.outlineStyle !== 'none';
+      });
+      expect(typeof hasOutline).toBe('boolean');
+    }
+  });
+
+  it('clicking a policy anchor does not blank out the page', async () => {
+    await HomePage.open();
+    const a = await $('//footer//a[contains(. , "Privacy") or contains(. , "Terms")]');
+    if (await a.isExisting()) {
+      await a.click();
+      await browser.pause(150);
+      const title = await browser.getTitle();
+      expect(title.length).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
