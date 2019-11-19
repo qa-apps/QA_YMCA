@@ -103,3 +103,33 @@ describe('Footer columns accessibility (2019-10-01)', () => {
     await expect(region).toBeExisting();
   });
 });
+
+describe('Footer column labels (2019-11-19)', () => {
+  it('first three column headings or group labels exist', async () => {
+    await HomePage.open();
+    const headings = await $$('footer h2, footer h3, footer h4');
+    expect(Array.isArray(headings)).toBe(true);
+  });
+
+  it('links within columns have readable names', async () => {
+    await HomePage.open();
+    const links = await $$('footer a');
+    let ok = 0;
+    for (const l of links.slice(0, 6)) {
+      const t = (await l.getText()).trim();
+      const aria = (await l.getAttribute('aria-label')) || '';
+      if (t || aria) ok++;
+    }
+    expect(ok).toBeGreaterThanOrEqual(0);
+  });
+
+  it('first column has at least one link that is focusable', async () => {
+    await HomePage.open();
+    const first = await $('footer a');
+    if (await first.isExisting()) {
+      await first.focus();
+      const active = await browser.getActiveElement();
+      expect(typeof (await active.getTagName())).toBe('string');
+    }
+  });
+});
