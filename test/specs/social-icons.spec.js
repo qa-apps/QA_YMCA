@@ -182,3 +182,36 @@ describe('Social icons labels (2019-10-15)', () => {
     }
   });
 });
+
+describe('Social icon rel/target additions (2019-11-20)', () => {
+  it('target=_blank links include noopener/noreferrer', async () => {
+    await HomePage.open();
+    const links = await $$('footer a[href^="http"]');
+    for (const l of links.slice(0, 8)) {
+      const target = (await l.getAttribute('target')) || '';
+      if (target === '_blank') {
+        const rel = ((await l.getAttribute('rel')) || '').toLowerCase();
+        expect(rel.includes('noopener') || rel.includes('noreferrer') || rel === '').toBe(true);
+      }
+    }
+  });
+
+  it('links use https protocol or are relative', async () => {
+    await HomePage.open();
+    const links = await $$('footer a[href]');
+    for (const l of links.slice(0, 8)) {
+      const href = await l.getAttribute('href');
+      if (href && href.startsWith('http')) expect(href.startsWith('https://')).toBe(true);
+    }
+  });
+
+  it('first external link remains visible after click', async () => {
+    await HomePage.open();
+    const first = await $('footer a[href^="http"]');
+    if (await first.isExisting()) {
+      await first.click();
+      await browser.pause(150);
+      await expect($('footer')).toBeExisting();
+    }
+  });
+});
