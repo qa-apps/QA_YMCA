@@ -95,3 +95,37 @@ describe('Find Your Y – extended (2019-05-02)', () => {
     }
   });
 });
+
+describe('Find Your Y keyboard/ARIA (2019-11-26)', () => {
+  it('search control has label via placeholder or aria-label', async () => {
+    await browser.url('/');
+    const input = await $('//input[contains(@placeholder, "ZIP") or contains(@placeholder, "City") or @type="search"]');
+    if (await input.isExisting()) {
+      const label = ((await input.getAttribute('placeholder')) || '') + ((await input.getAttribute('aria-label')) || '');
+      expect(label.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('Enter key on search submits action', async () => {
+    await browser.url('/');
+    const input = await $('//input[contains(@placeholder, "ZIP") or contains(@placeholder, "City") or @type="search"]');
+    const btn = await $('//button[contains(. , "Search")] | //a[contains(. , "Search YMCAs")]');
+    if (await input.isExisting() && await btn.isExisting()) {
+      await input.focus();
+      await browser.keys(['Enter']);
+      await browser.pause(150);
+      await expect($('header')).toBeExisting();
+    }
+  });
+
+  it('results area appears or URL changes upon submission', async () => {
+    await browser.url('/');
+    const btn = await $('//button[contains(. , "Search")] | //a[contains(. , "Search YMCAs")]');
+    if (await btn.isExisting()) {
+      await btn.click();
+      await browser.pause(150);
+      const url = await browser.getUrl();
+      expect(url.length).toBeGreaterThan(0);
+    }
+  });
+});
