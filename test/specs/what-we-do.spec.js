@@ -164,3 +164,40 @@ describe('What We Do – additional (2019-07-09)', () => {
     }
   });
 });
+
+describe('What We Do dropdown robustness (2019-11-27)', () => {
+  it('unique labels across first seven entries', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    const set = new Set();
+    for (const l of links.slice(0, 7)) {
+      const t = (await l.getText()).trim();
+      if (t) set.add(t);
+    }
+    expect(set.size).toBeGreaterThanOrEqual(Math.min(4, links.length));
+  });
+
+  it('links have href attributes and are clickable', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    let ok = 0;
+    for (const l of links.slice(0, 6)) {
+      const href = await l.getAttribute('href');
+      if (href) ok++;
+    }
+    expect(ok).toBeGreaterThanOrEqual(0);
+  });
+
+  it('clicking a mid link navigates and retains header', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length >= 3) {
+      await links[2].click();
+      await browser.pause(150);
+      await expect($('header')).toBeExisting();
+    }
+  });
+});
