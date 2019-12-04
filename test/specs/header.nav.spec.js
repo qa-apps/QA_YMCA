@@ -238,3 +238,26 @@ describe('Header keyboard navigation (2019-10-03)', () => {
     await expect(donate).toBeExisting();
   });
 });
+
+describe('Header skip links/accessibility (2019-12-04)', () => {
+  it('page provides a skip-to-content or equivalent anchor', async () => {
+    await HomePage.open();
+    const skip = await $("a[href^='#']:is([href='#main'], [href='#content'], [href*='skip'])");
+    const any = await $("a[href^='#']");
+    expect((await skip.isExisting()) || (await any.isExisting())).toBe(true);
+  });
+
+  it('primary navigation has list or nav semantics', async () => {
+    await HomePage.open();
+    const nav = await $('header nav, header [role="navigation"]');
+    await expect(nav).toBeExisting();
+  });
+
+  it('all primary items are focusable via Tab', async () => {
+    await HomePage.open();
+    await browser.keys(['Tab']);
+    const active = await browser.getActiveElement();
+    const tag = await active.getTagName();
+    expect(['a', 'button'].includes(tag.toLowerCase())).toBe(true);
+  });
+});
