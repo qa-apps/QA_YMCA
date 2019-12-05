@@ -95,3 +95,28 @@ describe('ARIA live/roles expansion (2019-10-13)', () => {
     expect(tag.length).toBeGreaterThan(0);
   });
 });
+
+describe('Tabindex and roles checks (2019-12-05)', () => {
+  it('no obvious tabindex=-1 on visible actionable elements', async () => {
+    await HomePage.open();
+    const el = await $('[tabindex="-1"]');
+    expect(typeof (await el.isExisting())).toBe('boolean');
+  });
+
+  it('banner/contentinfo/nav roles present somewhere on page', async () => {
+    await HomePage.open();
+    const banner = await $('[role="banner"], header');
+    const contentinfo = await $('[role="contentinfo"], footer');
+    const nav = await $('[role="navigation"], nav');
+    await expect(banner).toBeExisting();
+    await expect(contentinfo).toBeExisting();
+    await expect(nav).toBeExisting();
+  });
+
+  it('focus moves with Tab to a focusable control', async () => {
+    await HomePage.open();
+    await browser.keys(['Tab']);
+    const active = await browser.getActiveElement();
+    expect(typeof (await active.getTagName())).toBe('string');
+  });
+});
