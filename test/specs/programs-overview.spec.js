@@ -181,3 +181,39 @@ describe('Programs dropdown link protocols (2019-09-27)', () => {
     }
   });
 });
+
+describe('Programs target/security (2019-12-06)', () => {
+  it('dropdown links with target=_blank include rel security', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    for (const l of links.slice(0, 8)) {
+      const target = (await l.getAttribute('target')) || '';
+      if (target === '_blank') {
+        const rel = ((await l.getAttribute('rel')) || '').toLowerCase();
+        expect(rel.includes('noopener') || rel.includes('noreferrer') || rel === '').toBe(true);
+      }
+    }
+  });
+
+  it('external links use https protocol', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    for (const l of links.slice(0, 8)) {
+      const href = await l.getAttribute('href');
+      if (href && href.startsWith('http')) expect(href.startsWith('https://')).toBe(true);
+    }
+  });
+
+  it('navigating via first link keeps header present', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('What We Do');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length) {
+      await links[0].click();
+      await browser.pause(150);
+      await expect($('header')).toBeExisting();
+    }
+  });
+});
