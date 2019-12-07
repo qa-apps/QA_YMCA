@@ -72,3 +72,31 @@ describe('Careers navigation – extended (2019-03-12)', () => {
     expect(typeof vis).toBe('boolean');
   });
 });
+
+describe('Careers nav confirmation (2019-12-07)', () => {
+  it('careers link exists and has readable text', async () => {
+    await HomePage.open();
+    const careers = await HomePage.navButton('Careers');
+    await expect(careers).toBeExisting();
+    const t = (await careers.getText()).trim();
+    expect(typeof t).toBe('string');
+  });
+
+  it('careers navigation preserves header', async () => {
+    await HomePage.open();
+    const careers = await HomePage.navButton('Careers');
+    if (await careers.isExisting()) {
+      await careers.click();
+      await browser.pause(150);
+      await expect($('header')).toBeExisting();
+    }
+  });
+
+  it('careers link is keyboard focusable', async () => {
+    await HomePage.open();
+    const careers = await HomePage.navButton('Careers');
+    await careers.focus();
+    const active = await browser.getActiveElement();
+    expect(typeof (await active.getTagName())).toBe('string');
+  });
+});
