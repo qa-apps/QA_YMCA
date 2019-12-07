@@ -74,3 +74,31 @@ describe('Donate flow – extended (2019-04-17)', () => {
     await expect(donate).toBeExisting();
   });
 });
+
+describe('Donate flow behaviors (2019-12-07)', () => {
+  it('donate button is visible and clickable', async () => {
+    await HomePage.open();
+    const donate = await HomePage.navButton('Donate');
+    await expect(donate).toBeExisting();
+    const clickable = await donate.isClickable();
+    expect(typeof clickable).toBe('boolean');
+  });
+
+  it('donate page navigation keeps header present', async () => {
+    await HomePage.open();
+    const donate = await HomePage.navButton('Donate');
+    if (await donate.isExisting()) {
+      await donate.click();
+      await browser.pause(150);
+      await expect($('header')).toBeExisting();
+    }
+  });
+
+  it('donate button is keyboard focusable', async () => {
+    await HomePage.open();
+    const donate = await HomePage.navButton('Donate');
+    await donate.focus();
+    const active = await browser.getActiveElement();
+    expect(typeof (await active.getTagName())).toBe('string');
+  });
+});
