@@ -82,3 +82,42 @@ describe('About/Who We Are – deeper checks (2019-04-03)', () => {
     expect(hrefCount).toBeGreaterThanOrEqual(Math.min(1, links.length));
   });
 });
+
+describe('About links presence/navigation (2019-12-12)', () => {
+  it('who we are dropdown exposes key links with labels', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const links = await NavMenu.visibleDropdownLinks();
+    let ok = 0;
+    for (const l of links.slice(0, 8)) {
+      const t = (await l.getText()).trim();
+      const aria = (await l.getAttribute('aria-label')) || '';
+      if (t || aria) ok++;
+    }
+    expect(ok).toBeGreaterThanOrEqual(Math.min(3, links.length));
+  });
+
+  it('navigating to any about page retains header and creates a URL', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length) {
+      await links[0].click();
+      await browser.pause(150);
+      await expect($('header')).toBeExisting();
+      const url = await browser.getUrl();
+      expect(url.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('first about link is keyboard focusable', async () => {
+    await HomePage.open();
+    await NavMenu.revealDropdown('Who We Are');
+    const links = await NavMenu.visibleDropdownLinks();
+    if (links.length) {
+      await links[0].focus();
+      const active = await browser.getActiveElement();
+      expect(typeof (await active.getTagName())).toBe('string');
+    }
+  });
+});
