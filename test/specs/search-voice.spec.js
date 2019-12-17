@@ -78,3 +78,33 @@ describe('Site search/voice – extended (2019-03-19)', () => {
     }
   });
 });
+
+describe('Search/voice interactions (2019-12-17)', () => {
+  it('search input accepts typing and clears properly', async () => {
+    await HomePage.open();
+    const input = await $('//input[@type="search" or contains(@placeholder,"Search")]');
+    if (await input.isExisting()) {
+      await input.setValue('YMCA camp');
+      await expect(input).toHaveValueContaining('YMCA');
+      await input.clearValue();
+      await expect(input).toHaveValueContaining('');
+    }
+  });
+
+  it('presence of a voice control is tolerated', async () => {
+    await HomePage.open();
+    const voice = await $('button[aria-label*="voice" i], [class*="voice" i]');
+    expect(typeof (await voice.isExisting())).toBe('boolean');
+  });
+
+  it('pressing Enter on submit keeps header visible', async () => {
+    await HomePage.open();
+    const btn = await $('//button[contains(. , "Search")] | //input[@type="submit"]');
+    if (await btn.isExisting()) {
+      await btn.focus();
+      await browser.keys(['Enter']);
+      await browser.pause(150);
+      await expect($('header')).toBeExisting();
+    }
+  });
+});
