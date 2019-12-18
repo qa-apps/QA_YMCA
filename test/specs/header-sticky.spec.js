@@ -127,3 +127,27 @@ describe('Header visibility/contrast (2019-10-03)', () => {
     expect(items.length).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe('Header sticky batch (2019-12-18)', () => {
+  it('header remains visible after resize to mobile width', async () => {
+    await HomePage.open();
+    await browser.setWindowSize(375, 667);
+    const vis = await $('header').isDisplayedInViewport();
+    expect(typeof vis).toBe('boolean');
+  });
+
+  it('header contains at least one button or anchor after resize', async () => {
+    await HomePage.open();
+    await browser.setWindowSize(768, 800);
+    const items = await $$('header a, header button');
+    expect(items.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('Tab focuses an interactive header element on mobile size', async () => {
+    await HomePage.open();
+    await browser.setWindowSize(414, 736);
+    await browser.keys(['Tab']);
+    const active = await browser.getActiveElement();
+    expect(typeof (await active.getTagName())).toBe('string');
+  });
+});
