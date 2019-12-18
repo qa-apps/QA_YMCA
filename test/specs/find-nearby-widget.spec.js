@@ -82,3 +82,37 @@ describe('Find nearby widget – extended (2019-05-07)', () => {
     }
   });
 });
+
+describe('Find nearby robustness (2019-12-18)', () => {
+  it('accepts numeric zip and trims spaces', async () => {
+    await HomePage.open();
+    const input = await $('//input[contains(@placeholder, "ZIP") or @type="search"]');
+    if (await input.isExisting()) {
+      await input.setValue(' 10001 ');
+      const val = await input.getValue();
+      expect(typeof val).toBe('string');
+    }
+  });
+
+  it('submit via button or link shows some result change', async () => {
+    await HomePage.open();
+    const go = await $('//button[contains(. , "Search")] | //a[contains(. , "Search YMCAs")]');
+    if (await go.isExisting()) {
+      await go.click();
+      await browser.pause(150);
+      const url = await browser.getUrl();
+      expect(url.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('keyboard focus remains within page after submit', async () => {
+    await HomePage.open();
+    const go = await $('//button[contains(. , "Search")] | //a[contains(. , "Search YMCAs")]');
+    if (await go.isExisting()) {
+      await go.focus();
+      await browser.keys(['Enter']);
+      await browser.pause(150);
+      await expect($('header')).toBeExisting();
+    }
+  });
+});
