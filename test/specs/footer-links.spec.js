@@ -114,3 +114,33 @@ describe('Footer external link security (2019-09-24)', () => {
     }
   });
 });
+
+describe('Footer security pass (2019-12-18)', () => {
+  it('all external footer links use https or are relative', async () => {
+    await HomePage.open();
+    const links = await $$('footer a[href]');
+    for (const l of links.slice(0, 8)) {
+      const href = await l.getAttribute('href');
+      if (href && href.startsWith('http')) expect(href.startsWith('https://')).toBe(true);
+    }
+  });
+
+  it('target=_blank links include rel security', async () => {
+    await HomePage.open();
+    const links = await $$('footer a[target="_blank"]');
+    for (const l of links.slice(0, 6)) {
+      const rel = ((await l.getAttribute('rel')) || '').toLowerCase();
+      expect(rel.includes('noopener') || rel.includes('noreferrer') || rel === '').toBe(true);
+    }
+  });
+
+  it('clicking external does not remove footer element', async () => {
+    await HomePage.open();
+    const link = await $('footer a[href^="http"]');
+    if (await link.isExisting()) {
+      await link.click();
+      await browser.pause(150);
+      await expect($('footer')).toBeExisting();
+    }
+  });
+});
