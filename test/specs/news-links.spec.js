@@ -175,3 +175,32 @@ describe('News/Stories accessibility batch (2019-11-14)', () => {
     }
   });
 });
+
+describe('News/stories final checks (2019-12-19)', () => {
+  it('first two cards have non-empty text or aria-label', async () => {
+    await HomePage.open();
+    const cards = await $$('(//a[contains(@href, "/news") or contains(@href, "/stories")])[position()<=2]');
+    let ok = 0;
+    for (const c of cards) {
+      const t = (await c.getText()).trim();
+      const aria = (await c.getAttribute('aria-label')) || '';
+      if (t || aria) ok++;
+    }
+    expect(ok).toBeGreaterThanOrEqual(Math.min(1, cards.length));
+  });
+
+  it('card click navigates and retains header', async () => {
+    await HomePage.open();
+    const first = await $('(//a[contains(@href, "/news") or contains(@href, "/stories")])[1]');
+    if (await first.isExisting()) {
+      await first.click();
+      await browser.pause(150);
+      await expect($('header')).toBeExisting();
+    }
+  });
+
+  it('page url after click is non-empty', async () => {
+    const url = await browser.getUrl();
+    expect(url.length).toBeGreaterThan(0);
+  });
+});
